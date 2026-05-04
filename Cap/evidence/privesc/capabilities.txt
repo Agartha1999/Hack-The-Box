@@ -1,0 +1,4 @@
+/usr/lib/nmap/nmap cap_net_bind_service,cap_net_admin,cap_net_raw=eip
+/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper cap_net_bind_service,cap_net_admin,cap_sys_nice=ep
+/usr/bin/dumpcap cap_net_admin,cap_net_raw=eip
+/usr/bin/fping cap_net_raw=ep

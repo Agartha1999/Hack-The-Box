@@ -1,0 +1,6 @@
+Target: 10.129.54.196
+Ports: 21,22,80
+Vuln: IDOR /data/[id]
+PCAP → FTP creds
+Password reuse → SSH
+PrivEsc → python capabilities

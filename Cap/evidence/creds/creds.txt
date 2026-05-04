@@ -1,0 +1,4 @@
+user: nathan
+password: (Buck3tH4TF0RM3!)
+source: FTP (pcap)
+ip: 10.129.54.196
