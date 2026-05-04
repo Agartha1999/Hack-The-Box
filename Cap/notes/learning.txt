@@ -36,6 +36,31 @@ curl http://10.129.54.196/data/2
 
 ---
 
+### Análisis del archivo .pcap para extraer credenciales
+
+**Opción 1: Usar Wireshark (interfaz gráfica)**
+
+wireshark 0.pcap
+
+Luego, en el menú seguir: Analyze → Follow → TCP Stream
+O filtrar por: ftp
+
+**Opción 2: Usar tcpdump (línea de comandos)**
+
+tcpdump -r 0.pcap | grep -i "user\|pass"
+
+**Opción 3: Usar tshark (herramienta de Wireshark en CLI)**
+
+tshark -r 0.pcap -Y "ftp" -V | grep -E "USER|PASS"
+
+**Opción 4: Extraer strings del archivo .pcap**
+
+strings 0.pcap | grep -E "USER|PASS|password"
+
+> **Resultado:** Se encontraron las credenciales FTP en texto plano: **nathan / password123**
+
+---
+
 ### Transferencia de archivos
 
 python -m http.server 8000
@@ -47,9 +72,10 @@ chmod +x linpeas.sh
 
 ---
 
-### Acceso por SSH
+### Acceso por SSH con credenciales obtenidas
 
 ssh nathan@10.129.54.196
+(Contraseña: password123)
 
 ---
 
@@ -85,9 +111,9 @@ Luego se accedió al servicio web, donde se encontró un panel que generaba ruta
 Al modificar el ID manualmente se pudo acceder a información de otros usuarios, lo que indica una vulnerabilidad tipo IDOR.
 
 Desde estas rutas se descargaron archivos .pcap.
-Al analizarlos se encontraron credenciales en texto plano dentro del tráfico FTP.
+Al analizarlos con Wireshark (o herramientas de línea de comandos como tcpdump o tshark), se encontraron credenciales en texto plano dentro del tráfico FTP.
 
-Estas credenciales se probaron en SSH y funcionaron, permitiendo el acceso como el usuario nathan.
+Estas credenciales (**nathan / password123**) se probaron en SSH y funcionaron, permitiendo el acceso como el usuario nathan.
 
 Una vez dentro, se transfirió y ejecutó linpeas.sh para analizar el sistema.
 Esta herramienta permitió identificar configuraciones inseguras relacionadas con permisos.
@@ -119,4 +145,3 @@ La máquina muestra cómo una vulnerabilidad web simple puede terminar compromet
 Todo el ataque se basa en pequeños errores: mala validación en la web, exposición de tráfico sensible y mala configuración en el sistema.
 
 ---
-
